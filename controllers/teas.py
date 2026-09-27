@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from models.tea import TeaModel
-from serializers.tea import TeaSchema
+from serializers.tea import TeaSchema, CreateTeaSchema
 from typing import List
 from database import get_db
 
@@ -22,3 +22,7 @@ def get_single_tea(tea_id: int, db: Session = Depends(get_db)):
     if not tea:
         raise HTTPException(status_code=404, detail="Tea not found")
     return tea
+
+
+@router.post("/teas", response_model=TeaSchema)
+def create_tea(tea: CreateTeaSchema, db: Session = Depends(get_db)):
