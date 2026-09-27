@@ -1,20 +1,15 @@
-# models/tea.py
-from sqlalchemy import Column, Integer, String, Boolean
-from sqlalchemy.orm import relationship  # Import the relationship function from SQLAlchemy ORM
-from .base import BaseModel  # Import the base model for SQLAlchemy
-from .comment import CommentModel  # Import the CommentModel class for establishing relationships
+# models/comment.py
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
+from .base import BaseModel
 
-# Update Base to BaseModel
-class TeaModel(BaseModel):
+class CommentModel(BaseModel):
 
-    __tablename__ = "teas"
+    __tablename__ = "comments"  # The name of the table in the database
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True)  # Unique identifier for the comment
+    content = Column(String, nullable=False)  # The text content of the comment
 
-    # Specific columns for our Tea Table.
-    name = Column(String, unique=True)
-    in_stock = Column(Boolean)
-    rating = Column(Integer)
-
-    # Define a relationship with the CommentModel table
-    comments = relationship("CommentModel", back_populates="tea")
+    # ForeignKey establishes a connection to the teas table
+    tea_id = Column(Integer, ForeignKey("teas.id", ondelete="CASCADE"), nullable=False)
+    tea = relationship("TeaModel", back_populates="comments", passive_deletes=True)  # Defines the relationship to the TeaModel
