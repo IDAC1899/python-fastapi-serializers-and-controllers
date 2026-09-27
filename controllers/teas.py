@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from models.tea import TeaModel
-from serializers.tea import TeaSchema, CreateTeaSchema
+from serializers.tea import TeaSchema, CreateTeaSchema, UpdateTeaSchema
 from typing import List
 from database import get_db
 
@@ -26,3 +26,23 @@ def get_single_tea(tea_id: int, db: Session = Depends(get_db)):
 
 @router.post("/teas", response_model=TeaSchema)
 def create_tea(tea: CreateTeaSchema, db: Session = Depends(get_db)):
+    new_tea = TeaModel(**tea.dict()) # Convert Pydantic model to SQLAlchemy model
+    db.add(new_tea)
+    db.commit() # Save to database
+    db.refresh(new_tea) # Refresh to get the updated data (including auto-generated fields)
+    return new_tea
+
+
+@router.put("/teas/{tea_id}", response_model=TeaSchema)
+def update_tea(tea_id: int, tea: UpdateTeaSchema, db: Session = Depends(get_db)):
+    db_tea = db.query(TeaModel).filter(TeaModel.id == tea_id).first()
+    if not db_tea:
+        raise HTTPException(status_code=404, detail="Tea not found")
+
+    tea_data = tea.dict(exclude_unset=True)  # Only update the fields provided
+    for key, value in tea_data.items():
+        setattr(db_tea, key, value)
+
+    db.commit()  # Save changes
+    db.refresh(db_tea)  # Refresh to get updated data
+    return db_tea
