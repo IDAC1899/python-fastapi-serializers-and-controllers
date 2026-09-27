@@ -17,4 +17,4 @@ class TeaModel(BaseModel):
     rating = Column(Integer)
 
     # Define a relationship with the CommentModel table
-    comments = relationship("CommentModel", back_populates="tea")
+    comments = relationship('CommentModel', back_populates='tea',  cascade="all, delete-orphan")
