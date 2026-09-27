@@ -14,3 +14,11 @@ router = APIRouter()
 def get_teas(db: Session = Depends(get_db)):
     teas = db.query(TeaModel).all()
     return teas
+
+
+@router.get("/teas/{tea_id}", response_model=TeaSchema)
+def get_single_tea(tea_id: int, db: Session = Depends(get_db)):
+    tea = db.query(TeaModel).filter(TeaModel.id == tea_id).first()
+    if not tea:
+        raise HTTPException(status_code=404, detail="Tea not found")
+    return tea
