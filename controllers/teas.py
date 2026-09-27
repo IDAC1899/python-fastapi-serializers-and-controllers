@@ -46,3 +46,14 @@ def update_tea(tea_id: int, tea: UpdateTeaSchema, db: Session = Depends(get_db))
     db.commit()  # Save changes
     db.refresh(db_tea)  # Refresh to get updated data
     return db_tea
+
+
+@router.delete("/teas/{tea_id}")
+def delete_tea(tea_id: int, db: Session = Depends(get_db)):
+    db_tea = db.query(TeaModel).filter(TeaModel.id == tea_id).first()
+    if not db_tea:
+        raise HTTPException(status_code=404, detail="Tea not found")
+
+    db.delete(db_tea)  # Remove from database
+    db.commit()  # Save changes
+    return {"message": f"Tea with ID {tea_id} has been deleted"}
