@@ -11,5 +11,5 @@ class CommentModel(BaseModel):
     content = Column(String, nullable=False)  # The text content of the comment
 
     # ForeignKey establishes a connection to the teas table
-    tea_id = Column(Integer, ForeignKey('teas.id'), nullable=False)
-    tea = relationship("TeaModel", back_populates="comments")  # Defines the relationship to the TeaModel
+    tea_id = Column(Integer, ForeignKey("teas.id", ondelete="CASCADE"), nullable=False)
+    tea = relationship("TeaModel", back_populates="comments", passive_deletes=True)  # Defines the relationship to the TeaModel
